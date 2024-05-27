@@ -1,8 +1,9 @@
-PS C:\Users\nitikaborkar\Internship> python test.py
+C:\Users\nitikaborkar\Internship>python -m venv myenv
 Python path configuration:
-  PYTHONHOME = (not set)
-  PYTHONPATH = (not set)
-  program name = 'C:\Users\nitikaborkar\AppData\Local\Programs\Python\Python312\python.exe'  isolated = 0
+  PYTHONHOME = 'C:\Users\nitikaborkar\AppData\Local\Programs\Python\Python312'
+  PYTHONPATH = 'C:\Users\nitikaborkar\AppData\Local\Programs\Python\Python312\Lib'
+  program name = 'python'
+  isolated = 0
   environment = 1
   user site = 1
   safe_path = 0
@@ -10,14 +11,15 @@ Python path configuration:
   is in build tree = 0
   stdlib dir = 'C:\Users\nitikaborkar\AppData\Local\Programs\Python\Python312\Lib'
   sys._base_executable = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
-  sys.base_prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312' 
+  sys.base_prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312'
   sys.base_exec_prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312'
   sys.platlibdir = 'DLLs'
   sys.executable = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
-  sys.prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312'      
-  sys.exec_prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312' 
+  sys.prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312'
+  sys.exec_prefix = 'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312'
   sys.path = [
-    'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip', 
+    'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+    'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
     'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
     'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
     'C:\\Users\\nitikaborkar\\AppData\\Local\\Programs\\Python\\Python312',
@@ -26,5 +28,89 @@ Fatal Python error: init_fs_encoding: failed to get the Python codec of the file
 Python runtime state: core initialized
 LookupError: unknown encoding: utf-8
 
-Current thread 0x00002a34 (most recent call first):
+Current thread 0x000027d0 (most recent call first):
   <no Python frame>
+
+C:\Users\nitikaborkar\Internship>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
