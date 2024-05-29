@@ -1,19 +1,19 @@
-# Retention Stage: Churn Prediction Model
+# Retention Stage: Customer Lifetime Value (CLTV) Prediction Model
 
-Churn prediction models are crucial in the retention phase to identify customers who are likely to leave the bank. By proactively addressing their needs and concerns, the bank can implement targeted retention strategies to reduce churn and maintain a loyal customer base.
+Customer Lifetime Value (CLTV) prediction is a critical aspect of customer retention strategy. It helps in identifying the long-term value of a customer to the bank, allowing for strategic decisions on where to invest marketing and retention efforts.
 
-### Churn Prediction Model
+### Customer Lifetime Value (CLTV) Prediction Model
 
 **Objective:**
 
-- Predict which customers are likely to churn (leave the bank) and take preemptive actions to retain them.
-- Enhance customer loyalty and reduce churn rate by addressing issues before customers decide to leave.
+- Predict the lifetime value of customers to prioritize high-value customers for retention and targeted marketing campaigns.
+- Optimize resource allocation by focusing on customers with the highest potential value.
 
 **Methodology:**
 
 1. **Data Preparation:**
-    - Collect and preprocess customer data, including demographics, transaction history, product usage, and engagement metrics.
-    - Data sources include transactional logs, customer service interactions, and historical churn data.
+    - Collect and preprocess customer data, including transactional, behavioral, and demographic information.
+    - Historical transaction data and customer interaction logs are crucial.
 2. **Attribute Selection:**
     - **Raw Attributes:**
         - Customer ID
@@ -27,25 +27,26 @@ Churn prediction models are crucial in the retention phase to identify customers
         - Complaint logs and resolution times
         - Tenure with the bank
     - **Derived Attributes:**
+        - Average purchase value: Average value of transactions.
+        - Purchase frequency: Number of purchases in a given period.
+        - Recency: Time since the last purchase.
         - Engagement score: Measure of overall engagement with the bank's services.
         - Customer satisfaction score: Derived from surveys or feedback forms.
-        - Churn score: Probability score indicating likelihood of churn.
-        - Product utilization rate: Frequency and extent of product usage.
+        - Churn probability: Probability of the customer leaving the bank.
     - **Target Variable:**
-        - Churn status (binary: 1 if the customer churned, 0 otherwise)
+        - CLTV: Predicted monetary value of a customer over their entire relationship with the bank.
 3. **Model Selection:**
-    - **Classification Algorithms:**
-        - Logistic Regression
-        - Random Forest
-        - Gradient Boosting Machines (GBM)
-        - Support Vector Machine (SVM)
+    - **Regression Algorithms:**
+        - Linear Regression
+        - Random Forest Regressor
+        - Gradient Boosting Regressor
+        - XGBoost
         - Neural Networks
     - **Evaluation Metrics:**
-        - Accuracy
-        - Precision
-        - Recall
-        - F1-Score
-        - Area Under the ROC Curve (AUC-ROC)
+        - Mean Absolute Error (MAE)
+        - Mean Squared Error (MSE)
+        - Root Mean Squared Error (RMSE)
+        - R-squared (R²)
 
 ### Implementation Steps
 
@@ -67,7 +68,7 @@ Churn prediction models are crucial in the retention phase to identify customers
         'average_transaction_value': [2000, 5000, 3000, 4000, 1500],
         'engagement_score': [3, 5, 4, 4, 2],
         'tenure': [2, 10, 5, 8, 1],
-        'churn_status': [0, 1, 0, 0, 1]
+        'cltv': [20000, 120000, 75000, 100000, 45000]
     }
     df = pd.DataFrame(data)
     
@@ -82,52 +83,50 @@ Churn prediction models are crucial in the retention phase to identify customers
     df[numerical_features] = scaler.fit_transform(df[numerical_features])
     
     # Split data into train and test sets
-    X = df.drop(['customer_id', 'churn_status'], axis=1)
-    y = df['churn_status']
+    X = df.drop(['customer_id', 'cltv'], axis=1)
+    y = df['cltv']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     ```
     
 2. **Model Training and Evaluation:**
     
-    **Random Forest Classifier:**
+    **Gradient Boosting Regressor:**
     
     ```python
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    import numpy as np
     
-    # Train Random Forest model
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    # Train Gradient Boosting model
+    model = GradientBoostingRegressor(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
     
     # Predict on test data
     y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)[:, 1]
     
     # Evaluate model performance
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    auc_roc = roc_auc_score(y_test, y_prob)
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_test, y_pred)
     
-    print(f'Accuracy: {accuracy}')
-    print(f'Precision: {precision}')
-    print(f'Recall: {recall}')
-    print(f'F1-Score: {f1}')
-    print(f'ROC AUC: {auc_roc}')
+    print(f'Mean Absolute Error: {mae}')
+    print(f'Mean Squared Error: {mse}')
+    print(f'Root Mean Squared Error: {rmse}')
+    print(f'R-squared: {r2}')
     
     ```
     
 
-### Variables for Churn Prediction
+### Variables for CLTV Prediction
 
 1. **Customer Attributes:**
     - **Customer ID:** Unique identifier for each customer.
-    - **Age:** Different age groups may have varying churn rates.
-    - **Income:** Financial stability may influence customer loyalty.
+    - **Age:** Different age groups may have varying lifetime values.
+    - **Income:** Financial stability can impact spending and saving behaviors.
     - **Occupation:** Reflects lifestyle and financial needs.
-    - **Credit Score:** Higher scores may correlate with lower churn rates.
+    - **Credit Score:** Higher scores may correlate with higher lifetime values.
     - **Product Holdings:** Number and type of products owned by the customer.
 2. **Transactional and Behavioral Data:**
     - **Transaction Frequency:** Frequency of transactions can indicate engagement.
@@ -136,13 +135,15 @@ Churn prediction models are crucial in the retention phase to identify customers
     - **Tenure:** Duration of the customer's relationship with the bank.
     - **Complaint Logs:** History of customer complaints and resolution times.
 3. **Derived Attributes:**
-    - **Churn Score:** Probability of the customer leaving the bank.
+    - **Average Purchase Value:** Average value of transactions.
+    - **Purchase Frequency:** Number of purchases in a given period.
+    - **Recency:** Time since the last purchase.
     - **Engagement Score:** Comprehensive measure of customer activity.
     - **Customer Satisfaction Score:** Derived from feedback or survey responses.
-    - **Product Utilization Rate:** Frequency and extent of product usage.
+    - **Churn Probability:** Probability of the customer leaving the bank.
 4. **Target Variable:**
-    - **Churn Status:** Binary indicator of whether the customer has churned (1) or not (0).
+    - **CLTV:** Predicted monetary value of a customer over their entire relationship with the bank.
 
 ### Conclusion
 
-By implementing a churn prediction model, the bank can proactively identify at-risk customers and implement targeted retention strategies. This approach helps in reducing churn rates, maintaining customer loyalty, and enhancing overall customer satisfaction. Using advanced machine learning techniques and a comprehensive set of attributes, the bank can effectively predict and address customer churn, ensuring a stable and loyal customer base.
+By implementing a CLTV prediction model, the bank can effectively identify high-value customers and focus its retention and marketing efforts on them. This strategic approach ensures that resources are allocated efficiently, maximizing long-term profitability and enhancing customer satisfaction. Using advanced regression techniques and a comprehensive set of attributes, the bank can accurately predict customer lifetime value and make informed business decisions.
