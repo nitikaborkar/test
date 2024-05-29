@@ -1,19 +1,19 @@
-# Engagement Stage: Recommendation Systems
+# Retention Stage: Churn Prediction Model
 
-After identifying and targeting potential new customers through look-alike or uplift modeling, and enhancing engagement through cross-selling and upselling, the next step is to implement recommendation systems. These systems aim to suggest relevant products and services to customers based on their past behaviors and preferences, further enhancing customer engagement and satisfaction.
+Churn prediction models are crucial in the retention phase to identify customers who are likely to leave the bank. By proactively addressing their needs and concerns, the bank can implement targeted retention strategies to reduce churn and maintain a loyal customer base.
 
-### Recommendation Systems
+### Churn Prediction Model
 
 **Objective:**
 
-- Personalize customer experience by recommending products and services that align with their preferences and needs.
-- Increase product adoption and customer satisfaction through targeted recommendations.
+- Predict which customers are likely to churn (leave the bank) and take preemptive actions to retain them.
+- Enhance customer loyalty and reduce churn rate by addressing issues before customers decide to leave.
 
 **Methodology:**
 
 1. **Data Preparation:**
-    - Collect and preprocess customer data, including transaction history, product holdings, and interaction data.
-    - Data sources include transactional logs, customer profiles, and engagement metrics.
+    - Collect and preprocess customer data, including demographics, transaction history, product usage, and engagement metrics.
+    - Data sources include transactional logs, customer service interactions, and historical churn data.
 2. **Attribute Selection:**
     - **Raw Attributes:**
         - Customer ID
@@ -24,20 +24,28 @@ After identifying and targeting potential new customers through look-alike or up
         - Product holdings (e.g., savings account, loan, credit card)
         - Transaction history (frequency, recency, monetary value)
         - Customer interactions (e.g., website visits, customer service interactions)
+        - Complaint logs and resolution times
+        - Tenure with the bank
     - **Derived Attributes:**
-        - Product affinity score: Likelihood of interest in specific products based on past behavior and similar customer profiles.
         - Engagement score: Measure of overall engagement with the bank's services.
-        - Spending patterns: Trends in spending and saving behavior.
-        - Customer lifetime value (CLTV): Projected long-term value of the customer to the bank.
-    - **Target Variables:**
-        - Recommended product uptake (binary: yes/no)
-        - Customer satisfaction score after recommendation (optional)
+        - Customer satisfaction score: Derived from surveys or feedback forms.
+        - Churn score: Probability score indicating likelihood of churn.
+        - Product utilization rate: Frequency and extent of product usage.
+    - **Target Variable:**
+        - Churn status (binary: 1 if the customer churned, 0 otherwise)
 3. **Model Selection:**
-    - **Recommendation System Types:**
-        - **Collaborative Filtering:** Based on similarities between users or items.
-        - **Content-Based Filtering:** Based on similarities in product attributes.
-        - **Hybrid Models:** Combines collaborative and content-based approaches.
-    - **Algorithms:** Matrix Factorization, k-Nearest Neighbors (k-NN), Singular Value Decomposition (SVD), Neural Collaborative Filtering.
+    - **Classification Algorithms:**
+        - Logistic Regression
+        - Random Forest
+        - Gradient Boosting Machines (GBM)
+        - Support Vector Machine (SVM)
+        - Neural Networks
+    - **Evaluation Metrics:**
+        - Accuracy
+        - Precision
+        - Recall
+        - F1-Score
+        - Area Under the ROC Curve (AUC-ROC)
 
 ### Implementation Steps
 
@@ -45,7 +53,8 @@ After identifying and targeting potential new customers through look-alike or up
     
     ```python
     import pandas as pd
-    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder
+    from sklearn.model_selection import train_test_split
     
     # Sample customer data
     data = {
@@ -56,7 +65,9 @@ After identifying and targeting potential new customers through look-alike or up
         'product_holdings': ['savings,loan', 'savings,credit card', 'savings,loan', 'savings', 'loan'],
         'transaction_frequency': [15, 50, 25, 30, 10],
         'average_transaction_value': [2000, 5000, 3000, 4000, 1500],
-        'engagement_score': [3, 5, 4, 4, 2]
+        'engagement_score': [3, 5, 4, 4, 2],
+        'tenure': [2, 10, 5, 8, 1],
+        'churn_status': [0, 1, 0, 0, 1]
     }
     df = pd.DataFrame(data)
     
@@ -67,126 +78,71 @@ After identifying and targeting potential new customers through look-alike or up
     
     # Standardize numerical features
     scaler = StandardScaler()
-    numerical_features = ['age', 'income', 'cibil_score', 'transaction_frequency', 'average_transaction_value', 'engagement_score']
+    numerical_features = ['age', 'income', 'cibil_score', 'transaction_frequency', 'average_transaction_value', 'engagement_score', 'tenure']
     df[numerical_features] = scaler.fit_transform(df[numerical_features])
     
-    ```
-    
-2. **Collaborative Filtering Example:**
-    
-    **Matrix Factorization (using Singular Value Decomposition - SVD):**
-    
-    ```python
-    from surprise import Dataset, Reader, SVD
-    from surprise.model_selection import train_test_split, cross_validate
-    
-    # Sample interaction data (user_id, item_id, rating)
-    interaction_data = {
-        'user_id': [1, 1, 1, 2, 2, 3, 3, 4, 4, 5],
-        'item_id': [101, 102, 103, 101, 103, 102, 104, 101, 104, 103],
-        'rating': [5, 4, 3, 4, 5, 3, 4, 2, 5, 3]
-    }
-    interaction_df = pd.DataFrame(interaction_data)
-    
-    # Convert data into Surprise format
-    reader = Reader(rating_scale=(1, 5))
-    data = Dataset.load_from_df(interaction_df[['user_id', 'item_id', 'rating']], reader)
-    
-    # Train-test split
-    trainset, testset = train_test_split(data, test_size=0.2)
-    
-    # Train SVD model
-    svd = SVD()
-    svd.fit(trainset)
-    
-    # Evaluate model
-    predictions = svd.test(testset)
-    cross_validate(svd, data, measures=['RMSE', 'MAE'], cv=5, verbose=True)
+    # Split data into train and test sets
+    X = df.drop(['customer_id', 'churn_status'], axis=1)
+    y = df['churn_status']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     ```
     
-3. **Content-Based Filtering Example:**
+2. **Model Training and Evaluation:**
     
-    **Using TF-IDF for Product Descriptions:**
-    
-    ```python
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import linear_kernel
-    
-    # Sample product descriptions
-    products = {
-        'product_id': [101, 102, 103, 104],
-        'description': [
-            "Savings account with high interest rates",
-            "Personal loan with flexible repayment options",
-            "Credit card with cashback offers",
-            "Home loan with low interest rates"
-        ]
-    }
-    product_df = pd.DataFrame(products)
-    
-    # Compute TF-IDF matrix
-    tfidf = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = tfidf.fit_transform(product_df['description'])
-    
-    # Compute similarity matrix
-    cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
-    
-    # Function to get recommendations based on product description
-    def get_recommendations(product_id, cosine_sim=cosine_sim):
-        idx = product_df[product_df['product_id'] == product_id].index[0]
-        sim_scores = list(enumerate(cosine_sim[idx]))
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-        sim_scores = sim_scores[1:4]  # Get top 3 similar products
-        product_indices = [i[0] for i in sim_scores]
-        return product_df['product_id'].iloc[product_indices]
-    
-    # Example usage
-    print(get_recommendations(101))
-    
-    ```
-    
-4. **Hybrid Recommendation System Example:**
-    
-    **Combining Collaborative and Content-Based Filtering:**
+    **Random Forest Classifier:**
     
     ```python
-    # Assuming collaborative_filtering_predictions and content_based_predictions
-    # are dataframes with customer_id and recommended product_id columns
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
     
-    # Merge predictions
-    hybrid_recommendations = pd.concat([collaborative_filtering_predictions, content_based_predictions]).drop_duplicates()
+    # Train Random Forest model
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
     
-    # Example to show recommendations for a specific customer
-    customer_id = 1
-    customer_recommendations = hybrid_recommendations[hybrid_recommendations['customer_id'] == customer_id]
-    print(customer_recommendations)
+    # Predict on test data
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
+    
+    # Evaluate model performance
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    auc_roc = roc_auc_score(y_test, y_prob)
+    
+    print(f'Accuracy: {accuracy}')
+    print(f'Precision: {precision}')
+    print(f'Recall: {recall}')
+    print(f'F1-Score: {f1}')
+    print(f'ROC AUC: {auc_roc}')
     
     ```
     
 
-### Variables for Recommendation Systems
+### Variables for Churn Prediction
 
 1. **Customer Attributes:**
     - **Customer ID:** Unique identifier for each customer.
-    - **Age:** Influences financial needs and product preferences.
-    - **Income:** Indicates financial capacity and potential product interest.
-    - **Occupation:** Provides insights into lifestyle and financial requirements.
-    - **Credit Score:** Reflects creditworthiness and financial behavior.
-    - **Product Holdings:** Current products owned by the customer.
+    - **Age:** Different age groups may have varying churn rates.
+    - **Income:** Financial stability may influence customer loyalty.
+    - **Occupation:** Reflects lifestyle and financial needs.
+    - **Credit Score:** Higher scores may correlate with lower churn rates.
+    - **Product Holdings:** Number and type of products owned by the customer.
 2. **Transactional and Behavioral Data:**
-    - **Transaction Frequency:** Indicates engagement level with banking services.
-    - **Average Transaction Value:** Suggests spending capacity and behavior.
-    - **Engagement Score:** Measures overall interaction and activity with the bank.
-    - **Customer Interactions:** Data from touchpoints like website visits and customer service.
+    - **Transaction Frequency:** Frequency of transactions can indicate engagement.
+    - **Average Transaction Value:** Monetary value of transactions.
+    - **Engagement Score:** Overall interaction and activity with the bank.
+    - **Tenure:** Duration of the customer's relationship with the bank.
+    - **Complaint Logs:** History of customer complaints and resolution times.
 3. **Derived Attributes:**
-    - **Product Affinity Score:** Calculated based on similarity to other customers who have purchased the product.
-    - **Spending Patterns:** Trends in spending and saving behavior.
-    - **Customer Lifetime Value (CLTV):** Estimated total value the customer will bring to the bank over time.
-4. **Target Variables:**
-    - **Recommended Product Uptake:** Binary indicator of whether the customer accepted the recommendation.
-    - **Customer Satisfaction Score:** Optional measure of customer satisfaction post-recommendation.
+    - **Churn Score:** Probability of the customer leaving the bank.
+    - **Engagement Score:** Comprehensive measure of customer activity.
+    - **Customer Satisfaction Score:** Derived from feedback or survey responses.
+    - **Product Utilization Rate:** Frequency and extent of product usage.
+4. **Target Variable:**
+    - **Churn Status:** Binary indicator of whether the customer has churned (1) or not (0).
 
 ### Conclusion
 
-By implementing a sophisticated recommendation system, the bank can personalize customer interactions, increase product adoption, and improve customer satisfaction. These systems leverage both collaborative and content-based approaches to provide tailored recommendations, thereby enhancing engagement and fostering long-term customer relationships.
+By implementing a churn prediction model, the bank can proactively identify at-risk customers and implement targeted retention strategies. This approach helps in reducing churn rates, maintaining customer loyalty, and enhancing overall customer satisfaction. Using advanced machine learning techniques and a comprehensive set of attributes, the bank can effectively predict and address customer churn, ensuring a stable and loyal customer base.
